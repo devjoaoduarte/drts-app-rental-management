@@ -2,6 +2,7 @@
 using Amazon.DynamoDBv2;
 using Amazon.DynamoDBv2.DocumentModel;
 using Rental.Management.Domain.Interfaces.Repositories;
+using Rental.Management.Domain.Entities;
 
 namespace Rental.Management.Infra.Repositories;
 
@@ -15,7 +16,12 @@ public class DynamoDbRepository<T> : IDynamoDbRepository<T> where T : class
     {
         _client = client;
         _context = new DynamoDBContext(client);
-        _tableName = "Motos"; // por padrão, nome da tabela = nome da classe
+        _tableName = typeof(T).Name switch
+        {
+            nameof(EntregadorRequest) => "Entregadores",
+            nameof(MotorcycleRequest) => "Motos",
+            _ => throw new InvalidOperationException($"Tabela não configurada para {typeof(T).Name}")
+        };
     }
 
     public async Task<T?> GetByIdAsync(string id)

@@ -1,11 +1,9 @@
-using Amazon;
 using Amazon.DynamoDBv2;
 using Amazon.S3;
 using Amazon.SQS;
 
 var builder = WebApplication.CreateBuilder(args);
 
-var awsRegion = RegionEndpoint.SAEast1;
 var awsConfig = builder.Configuration.GetSection("AWS");
 
 // DynamoDB Local
@@ -38,6 +36,8 @@ builder.Services.AddSingleton<IAmazonSQS>(_ =>
 
 builder.Services.AddSingleton(typeof(IDynamoDbRepository<>), typeof(DynamoDbRepository<>));
 builder.Services.AddScoped<IMotorcycleServices, MotorcycleService>();
+builder.Services.AddScoped<IEntregadoresService, EntregadoresService>();
+builder.Services.AddScoped<IS3Repository, S3Repository>();
 
 
 // Add services to the container.
@@ -52,7 +52,10 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     var dynamoClient = scope.ServiceProvider.GetRequiredService<IAmazonDynamoDB>();
-    await DynamoDbSetup.EnsureMotoTableExistsAsync(dynamoClient);
+    var s3Client = scope.ServiceProvider.GetRequiredService<IAmazonS3>();
+    await InfraSetup.EnsureMotoTableExistsAsync(dynamoClient);
+    await InfraSetup.EnsureEntregadoresTableExistsAsync(dynamoClient);
+    await InfraSetup.EnsureBucketExistsAsync(s3Client);
 }
 
 // Configure the HTTP request pipeline.
