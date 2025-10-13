@@ -2,11 +2,12 @@
 
 namespace Rental.Management.Domain.Interfaces.Services;
 
-public interface IMotorcycleServices
+public interface IMotorcycleService
 {
     Task<MotorcycleRequest> InsertMotorcycleAsync(MotorcycleRequest motorcycle);
     Task<IEnumerable<MotorcycleRequest>> GetMotorcycleByPlateAsync(string plate);
     Task<MotorcycleRequest> GetMotorcycleByIdAsync(string id);
     Task<bool> UpdatePlateMotorcycleAsync(MotorcycleRequest motorcycle, string newPlate);
     Task<bool> DeleteMotorcycleAsync(string id);
+    Task EnqueueNotificationMotorcycleCreationAsync(MotorcycleRequest request);
 }

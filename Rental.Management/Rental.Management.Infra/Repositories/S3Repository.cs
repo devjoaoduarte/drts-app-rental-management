@@ -70,49 +70,6 @@ public class S3Repository(IAmazonS3 client) : IS3Repository
         }
     }
 
-    public async Task<bool> DownloadImageToFileAsync(string s3Key)
-    {
-        const string bucketName = "fotos-cnh";
-        try
-        {
-            const string localFilePath = "C:\\Users\\Joao\\Pictures\\s3 - teste";
-
-            var request = new GetObjectRequest
-            {
-                BucketName = bucketName,
-                Key = s3Key
-            };
-
-            using var response = await _client.GetObjectAsync(request);
-
-            // Cria diretório local se não existir
-            var directory = Path.GetDirectoryName(localFilePath);
-            if (!string.IsNullOrEmpty(directory) && !Directory.Exists(directory))
-                Directory.CreateDirectory(directory);
-
-            // Salva o arquivo localmente
-            await response.WriteResponseStreamToFileAsync(localFilePath, false, default);
-
-            Console.WriteLine($"Arquivo '{s3Key}' baixado com sucesso para '{localFilePath}'.");
-            return true;
-        }
-        catch (AmazonS3Exception ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
-        {
-            Console.WriteLine($"Arquivo '{s3Key}' não encontrado no bucket '{bucketName}'.");
-            return false;
-        }
-        catch (AmazonS3Exception ex)
-        {
-            Console.WriteLine($"Erro AWS ao baixar arquivo: {ex.Message}");
-            return false;
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Erro inesperado ao baixar arquivo: {ex.Message}");
-            return false;
-        }
-    }
-
     private static string DetectMimeType(string base64)
     {
         if (base64.StartsWith("data:image/png", StringComparison.OrdinalIgnoreCase))

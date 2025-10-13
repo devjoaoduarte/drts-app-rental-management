@@ -4,9 +4,10 @@ using Rental.Management.Domain.Interfaces.Services;
 
 namespace Rental.Management.Domain.Services;
 
-public class MotorcycleService(IDynamoDbRepository<MotorcycleRequest> repository) : IMotorcycleServices
+public class MotorcycleService(IDynamoDbRepository<MotorcycleRequest> repository, ISQSRepository sqsRepository) : IMotorcycleService
 {
     private readonly IDynamoDbRepository<MotorcycleRequest> _repository = repository;
+    private readonly ISQSRepository _sqsRepository = sqsRepository;
 
     public async Task<MotorcycleRequest> InsertMotorcycleAsync(MotorcycleRequest motorcycle)
     {
@@ -36,4 +37,7 @@ public class MotorcycleService(IDynamoDbRepository<MotorcycleRequest> repository
         await _repository.DeleteAsync(id);
         return true;
     }
+
+    public async Task EnqueueNotificationMotorcycleCreationAsync(MotorcycleRequest request)
+        => await _sqsRepository.SendMessageAsync("motos.fifo", request);
 }

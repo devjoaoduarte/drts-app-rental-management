@@ -4,7 +4,7 @@ using System.Text.Json.Serialization;
 namespace Rental.Management.Domain.Entities;
 
 [DynamoDBTable("Entregadores")]
-public class EntregadorRequest
+public class DeliveryMenRequest
 {
     [DynamoDBHashKey]
     [JsonPropertyName("identificador")]

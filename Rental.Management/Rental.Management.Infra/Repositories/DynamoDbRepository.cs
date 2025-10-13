@@ -18,8 +18,10 @@ public class DynamoDbRepository<T> : IDynamoDbRepository<T> where T : class
         _context = new DynamoDBContext(client);
         _tableName = typeof(T).Name switch
         {
-            nameof(EntregadorRequest) => "Entregadores",
+            nameof(DeliveryMenRequest) => "Entregadores",
             nameof(MotorcycleRequest) => "Motos",
+            nameof(RentalTable) => "Locacoes",
+            nameof(MotorcycleNotificationsTable) => "MotosNotificacoes",
             _ => throw new InvalidOperationException($"Tabela não configurada para {typeof(T).Name}")
         };
     }

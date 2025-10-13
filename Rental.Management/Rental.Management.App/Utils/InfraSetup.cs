@@ -3,6 +3,8 @@ using Amazon.DynamoDBv2;
 using Amazon.S3.Model;
 using Amazon.S3;
 using Amazon.S3.Util;
+using Amazon.SQS.Model;
+using Amazon.SQS;
 
 namespace Rental.Management.App.Utils;
 
@@ -110,6 +112,77 @@ public static class InfraSetup
         }
     }
 
+    public static async Task EnsureLocacoesTableExistsAsync(IAmazonDynamoDB client)
+    {
+        const string tableName = "Locacoes";
+
+        var existingTables = await client.ListTablesAsync();
+
+        if (!existingTables.TableNames.Contains(tableName))
+        {
+            Console.WriteLine($"Criando tabela {tableName}...");
+
+            var request = new CreateTableRequest
+            {
+                TableName = tableName,
+
+                AttributeDefinitions = new List<AttributeDefinition>
+                {
+                    new AttributeDefinition("Identificador", ScalarAttributeType.S),
+                },
+                KeySchema = new List<KeySchemaElement>
+                {
+                    new KeySchemaElement("Identificador", KeyType.HASH)
+                },
+
+                ProvisionedThroughput = new ProvisionedThroughput(5, 5)
+            };
+
+            await client.CreateTableAsync(request);
+
+            Console.WriteLine("Tabela criada com sucesso!");
+        }
+        else
+        {
+            Console.WriteLine("Tabela já existe.");
+        }
+    }
+
+    public static async Task EnsureMotosNotificationTableExistsAsync(IAmazonDynamoDB client)
+    {
+        const string tableName = "MotosNotificacoes";
+
+        var existingTables = await client.ListTablesAsync();
+
+        if (!existingTables.TableNames.Contains(tableName))
+        {
+            Console.WriteLine($"Criando tabela {tableName}...");
+
+            var request = new CreateTableRequest
+            {
+                TableName = tableName,
+
+                AttributeDefinitions = new List<AttributeDefinition>
+                {
+                    new AttributeDefinition("Identificador", ScalarAttributeType.S),
+                },
+                KeySchema = new List<KeySchemaElement>
+                {
+                    new KeySchemaElement("Identificador", KeyType.HASH)
+                },
+
+                ProvisionedThroughput = new ProvisionedThroughput(5, 5)
+            };
+
+            await client.CreateTableAsync(request);
+
+            Console.WriteLine("Tabela criada com sucesso!");
+        }
+        else
+        {
+            Console.WriteLine("Tabela já existe.");
+        }
+    }
 
     public static async Task EnsureBucketExistsAsync(IAmazonS3 client)
     {
@@ -151,6 +224,44 @@ public static class InfraSetup
         catch (Exception ex)
         {
             Console.WriteLine($"Erro inesperado: {ex.Message}");
+        }
+    }
+
+    public static async Task EnsureMotosQueueExistsAsync(IAmazonSQS sqsClient)
+    {
+        const string queueName = "motos.fifo";
+
+        Console.WriteLine($"Verificando se a fila '{queueName}' existe...");
+
+        var listResponse = await sqsClient.ListQueuesAsync(new ListQueuesRequest());
+
+        listResponse.QueueUrls ??= [];
+
+        var queueUrl = listResponse.QueueUrls.FirstOrDefault(q => q.EndsWith(queueName));
+
+        if (queueUrl == null)
+        {
+            Console.WriteLine($"Fila '{queueName}' não encontrada. Criando...");
+
+            var attributes = new Dictionary<string, string>
+            {
+                { QueueAttributeName.FifoQueue, "true" },
+                { QueueAttributeName.ContentBasedDeduplication, "true" } // Evita precisar passar MessageDeduplicationId
+            };
+
+            var createRequest = new CreateQueueRequest
+            {
+                QueueName = queueName,
+                Attributes = attributes
+            };
+
+            var response = await sqsClient.CreateQueueAsync(createRequest);
+
+            Console.WriteLine($"Fila FIFO criada com sucesso! URL: {response.QueueUrl}");
+        }
+        else
+        {
+            Console.WriteLine($"Fila '{queueName}' já existe. URL: {queueUrl}");
         }
     }
 

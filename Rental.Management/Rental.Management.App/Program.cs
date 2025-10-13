@@ -1,6 +1,7 @@
 using Amazon.DynamoDBv2;
 using Amazon.S3;
 using Amazon.SQS;
+using Rental.Management.App.Consumers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -35,9 +36,13 @@ builder.Services.AddSingleton<IAmazonSQS>(_ =>
 });
 
 builder.Services.AddSingleton(typeof(IDynamoDbRepository<>), typeof(DynamoDbRepository<>));
-builder.Services.AddScoped<IMotorcycleServices, MotorcycleService>();
-builder.Services.AddScoped<IEntregadoresService, EntregadoresService>();
-builder.Services.AddScoped<IS3Repository, S3Repository>();
+builder.Services.AddSingleton<IMotorcycleService, MotorcycleService>();
+builder.Services.AddSingleton<IDeliveryMenService, EntregadoresService>();
+builder.Services.AddSingleton<IRentalService, LocacaoService>();
+builder.Services.AddSingleton<IS3Repository, S3Repository>();
+builder.Services.AddSingleton<ISQSRepository, SQSRepository>();
+
+builder.Services.AddHostedService<MotosQueueConsumerWorker>();
 
 
 // Add services to the container.
@@ -53,9 +58,13 @@ using (var scope = app.Services.CreateScope())
 {
     var dynamoClient = scope.ServiceProvider.GetRequiredService<IAmazonDynamoDB>();
     var s3Client = scope.ServiceProvider.GetRequiredService<IAmazonS3>();
+    var sqsClient = scope.ServiceProvider.GetRequiredService<IAmazonSQS>();
     await InfraSetup.EnsureMotoTableExistsAsync(dynamoClient);
     await InfraSetup.EnsureEntregadoresTableExistsAsync(dynamoClient);
+    await InfraSetup.EnsureLocacoesTableExistsAsync(dynamoClient);
+    await InfraSetup.EnsureMotosNotificationTableExistsAsync(dynamoClient);
     await InfraSetup.EnsureBucketExistsAsync(s3Client);
+    await InfraSetup.EnsureMotosQueueExistsAsync(sqsClient);
 }
 
 // Configure the HTTP request pipeline.
