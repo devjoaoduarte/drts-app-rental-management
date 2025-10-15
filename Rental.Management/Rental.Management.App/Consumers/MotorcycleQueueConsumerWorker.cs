@@ -4,18 +4,18 @@ using System.Text.Json;
 
 namespace Rental.Management.App.Consumers;
 
-public class MotosQueueConsumerWorker(IAmazonSQS sqsClient, IDynamoDbRepository<MotorcycleNotificationsTable> repository) : BackgroundService
+public class MotorcycleQueueConsumerWorker(IAmazonSQS sqsClient, IDynamoDbRepository<MotorcycleNotificationsTable> repository, ILogger<MotorcycleQueueConsumerWorker> logger) : BackgroundService
 {
     private readonly IAmazonSQS _sqsClient = sqsClient;
     private readonly IDynamoDbRepository<MotorcycleNotificationsTable> _repository = repository;
+    private readonly ILogger<MotorcycleQueueConsumerWorker> _logger = logger;
     private const string QueueName = "motos.fifo";
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
+        _logger.LogInformation("Worker consumo notificação motos iniciado.");
         var queueUrlResponse = await _sqsClient.GetQueueUrlAsync(QueueName);
         var queueUrl = queueUrlResponse.QueueUrl;
-
-        Console.WriteLine($"Consumidor da fila '{QueueName}' iniciado...");
 
         while (!stoppingToken.IsCancellationRequested)
         {
@@ -28,6 +28,8 @@ public class MotosQueueConsumerWorker(IAmazonSQS sqsClient, IDynamoDbRepository<
 
             if (response.Messages != null)
             {
+                _logger.LogInformation($"Número de mensagens coletadas: {response.Messages.Count}");
+
                 foreach (var message in response.Messages)
                 {
                     try
@@ -44,7 +46,7 @@ public class MotosQueueConsumerWorker(IAmazonSQS sqsClient, IDynamoDbRepository<
                     }
                     catch (Exception ex)
                     {
-                        Console.WriteLine($"Erro ao processar mensagem: {ex.Message}");
+                        _logger.LogError("Ocorreu um erro ao processar a mensagem.", ex.Message);
                     }
                 }
             }

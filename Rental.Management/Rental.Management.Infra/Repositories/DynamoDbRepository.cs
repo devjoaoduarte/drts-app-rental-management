@@ -3,9 +3,11 @@ using Amazon.DynamoDBv2;
 using Amazon.DynamoDBv2.DocumentModel;
 using Rental.Management.Domain.Interfaces.Repositories;
 using Rental.Management.Domain.Entities;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Rental.Management.Infra.Repositories;
 
+[ExcludeFromCodeCoverage]
 public class DynamoDbRepository<T> : IDynamoDbRepository<T> where T : class
 {
     private readonly DynamoDBContext _context;

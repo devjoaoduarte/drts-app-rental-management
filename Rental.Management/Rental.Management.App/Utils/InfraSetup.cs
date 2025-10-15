@@ -5,9 +5,11 @@ using Amazon.S3;
 using Amazon.S3.Util;
 using Amazon.SQS.Model;
 using Amazon.SQS;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Rental.Management.App.Utils;
 
+[ExcludeFromCodeCoverage]
 public static class InfraSetup
 {
     public static async Task EnsureMotoTableExistsAsync(IAmazonDynamoDB client)

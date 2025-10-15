@@ -4,7 +4,7 @@ using Rental.Management.Domain.Interfaces.Services;
 
 namespace Rental.Management.Domain.Services;
 
-public class EntregadoresService(IDynamoDbRepository<DeliveryMenRequest> repository, IS3Repository s3Repository) : IDeliveryMenService
+public class DeliveryMenService(IDynamoDbRepository<DeliveryMenRequest> repository, IS3Repository s3Repository) : IDeliveryMenService
 {
     private readonly IDynamoDbRepository<DeliveryMenRequest> _repository = repository;
     private readonly IS3Repository _s3Repository = s3Repository;

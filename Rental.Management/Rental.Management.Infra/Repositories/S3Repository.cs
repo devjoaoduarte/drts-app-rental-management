@@ -7,6 +7,7 @@ namespace Rental.Management.Infra.Repositories;
 public class S3Repository(IAmazonS3 client) : IS3Repository
 {
     private readonly IAmazonS3 _client = client;
+    private const string _bucketName = "fotos-cnh";
 
     public async Task<bool> UploadBase64Async(string fileName, string base64Content)
     {
@@ -14,8 +15,6 @@ public class S3Repository(IAmazonS3 client) : IS3Repository
         {
             if (string.IsNullOrWhiteSpace(base64Content))
                 throw new ArgumentException("O conteúdo base64 não pode ser vazio.");
-
-            const string bucketName = "fotos-cnh";
 
             // Detecta o tipo da imagem a partir do prefixo ou dos bytes iniciais
             string mimeType = DetectMimeType(base64Content);
@@ -38,7 +37,7 @@ public class S3Repository(IAmazonS3 client) : IS3Repository
 
             var putRequest = new PutObjectRequest
             {
-                BucketName = bucketName,
+                BucketName = _bucketName,
                 Key = fileName,
                 InputStream = stream,
                 ContentType = mimeType,

@@ -4,7 +4,7 @@ using Rental.Management.Domain.Interfaces.Services;
 
 namespace Rental.Management.Domain.Services;
 
-public class LocacaoService(IDynamoDbRepository<RentalTable> repository) : IRentalService
+public class RentalService(IDynamoDbRepository<RentalTable> repository) : IRentalService
 {
     private readonly IDynamoDbRepository<RentalTable> _repository = repository;
 

@@ -1,56 +1,15 @@
 using Amazon.DynamoDBv2;
 using Amazon.S3;
 using Amazon.SQS;
-using Rental.Management.App.Consumers;
+using Rental.Management.App;
 
 var builder = WebApplication.CreateBuilder(args);
-
-var awsConfig = builder.Configuration.GetSection("AWS");
-
-// DynamoDB Local
-builder.Services.AddSingleton<IAmazonDynamoDB>(_ =>
-{
-    return new AmazonDynamoDBClient(new AmazonDynamoDBConfig
-    {
-        ServiceURL = awsConfig["DynamoDbLocal"],
-        UseHttp = true
-    });
-});
-
-// S3 e SQS via LocalStack
-builder.Services.AddSingleton<IAmazonS3>(_ =>
-{
-    return new AmazonS3Client(new AmazonS3Config
-    {
-        ServiceURL = awsConfig["ServiceURL"],
-        ForcePathStyle = true
-    });
-});
-
-builder.Services.AddSingleton<IAmazonSQS>(_ =>
-{
-    return new AmazonSQSClient(new AmazonSQSConfig
-    {
-        ServiceURL = awsConfig["ServiceURL"]
-    });
-});
-
-builder.Services.AddSingleton(typeof(IDynamoDbRepository<>), typeof(DynamoDbRepository<>));
-builder.Services.AddSingleton<IMotorcycleService, MotorcycleService>();
-builder.Services.AddSingleton<IDeliveryMenService, EntregadoresService>();
-builder.Services.AddSingleton<IRentalService, LocacaoService>();
-builder.Services.AddSingleton<IS3Repository, S3Repository>();
-builder.Services.AddSingleton<ISQSRepository, SQSRepository>();
-
-builder.Services.AddHostedService<MotosQueueConsumerWorker>();
-
-
-// Add services to the container.
-
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+DependencyInjection.AddServices(builder.Services, builder.Configuration);
 
 var app = builder.Build();
 

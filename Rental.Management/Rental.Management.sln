@@ -5,9 +5,11 @@ VisualStudioVersion = 17.8.34316.72
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Rental.Management.App", "Rental.Management.App\Rental.Management.App.csproj", "{37BEADBF-81B9-4DB9-A59F-7AF88DAD5B4A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rental.Management.Domain", "Rental.Management.Domain\Rental.Management.Domain.csproj", "{6CA7727E-D76C-473E-AE82-85A8024D46F5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Rental.Management.Domain", "Rental.Management.Domain\Rental.Management.Domain.csproj", "{6CA7727E-D76C-473E-AE82-85A8024D46F5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rental.Management.Infra", "Rental.Management.Infra\Rental.Management.Infra.csproj", "{2F9D7256-9621-4CDE-96EE-1B6F8D88CCBC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Rental.Management.Infra", "Rental.Management.Infra\Rental.Management.Infra.csproj", "{2F9D7256-9621-4CDE-96EE-1B6F8D88CCBC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rental.Management.Tests", "Rental.Management.Tests\Rental.Management.Tests.csproj", "{4B47E6DC-5DC4-4CBC-B24D-485E9AEEEC19}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,6 +29,10 @@ Global
 		{2F9D7256-9621-4CDE-96EE-1B6F8D88CCBC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2F9D7256-9621-4CDE-96EE-1B6F8D88CCBC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2F9D7256-9621-4CDE-96EE-1B6F8D88CCBC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4B47E6DC-5DC4-4CBC-B24D-485E9AEEEC19}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4B47E6DC-5DC4-4CBC-B24D-485E9AEEEC19}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4B47E6DC-5DC4-4CBC-B24D-485E9AEEEC19}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4B47E6DC-5DC4-4CBC-B24D-485E9AEEEC19}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

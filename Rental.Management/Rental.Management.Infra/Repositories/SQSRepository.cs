@@ -1,22 +1,29 @@
 ﻿using Amazon.SQS;
 using Amazon.SQS.Model;
+using Microsoft.Extensions.Logging;
 using Rental.Management.Domain.Interfaces.Repositories;
 using System.Text.Json;
 
 namespace Rental.Management.Infra.Repositories;
 
-public class SQSRepository(IAmazonSQS sqsClient) : ISQSRepository
+public class SQSRepository(IAmazonSQS sqsClient, ILogger<SQSRepository> logger) : ISQSRepository
 {
     private readonly IAmazonSQS _sqsClient = sqsClient;
+    private readonly ILogger<SQSRepository> _logger = logger;
 
     public async Task SendMessageAsync<T>(string queueName, T message)
     {
+        _logger.LogInformation("Iniciado envio da mensagem.", message);
+
         var queues = await _sqsClient.ListQueuesAsync(new ListQueuesRequest());
         var queueUrl = queues.QueueUrls.FirstOrDefault(q => q.EndsWith(queueName));
 
         if (queueUrl == null)
+        {
+            _logger.LogError($"Fila não encontrada. '{queueName}'");
             throw new InvalidOperationException($"Fila '{queueName}' não encontrada.");
-
+        }
+              
         var json = JsonSerializer.Serialize(message);
 
         var sendRequest = new SendMessageRequest
@@ -28,6 +35,6 @@ public class SQSRepository(IAmazonSQS sqsClient) : ISQSRepository
         };
 
         await _sqsClient.SendMessageAsync(sendRequest);
-        Console.WriteLine($"Mensagem enviada para a fila '{queueName}'");
+        _logger.LogInformation($"Mensagem enviada para a fila '{queueName}'");
     }
 }
